@@ -7,9 +7,8 @@
 int top=-1;
 int s[MAX];
 
-
-void infixToPostfix(char infix[], char postfix[]){
-
+int isEmpty(){
+    return top == -1;
 }
 
 void push(char symbol){
@@ -20,16 +19,12 @@ void push(char symbol){
     s[++top] = symbol;
 }
 
-char pop(){
-    if(isEmpty()){
-        printf("Stack Underflow \n");
-        return;
-    }
-    return s[top--];
-}
-
-int isEmpty(){
-    return top == -1;
+char pop() {
+  if (isEmpty()) {
+    printf("Stack Underflow!\n");
+    exit(1);
+  }
+  return s[top--];
 }
 
 int precedence(char symbol){
@@ -51,7 +46,50 @@ int precedence(char symbol){
     }
 }
 
+void infixToPostfix(char infix[], char postfix[]) {
+    char symbol, next;
+    int p = 0;
 
+    for (int i = 0; infix[i] != '\0'; i++) {
+        symbol = infix[i];
+
+        if (symbol == ' ' || symbol == '\t') {
+        continue;
+        }
+
+        switch (symbol) {
+        case '(':
+            push(symbol);
+            break;
+
+        case ')':
+            while ((next = pop()) != '(') {
+                postfix[p++] = next;
+            }
+            break;
+
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '%':
+        case '^':
+        while (!isEmpty() && precedence(s[top]) >= precedence(symbol)) {
+            postfix[p++] = pop();
+        }
+        push(symbol);
+        break;
+
+        default:
+        postfix[p++] = symbol;
+    }
+  }
+
+  while (!isEmpty()) {
+    postfix[p++] = pop();
+  }
+  postfix[p] = '\0';
+}
 void main(){
     char infix[MAX], postfix[MAX];
 
